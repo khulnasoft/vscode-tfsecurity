@@ -1,0 +1,241 @@
+{
+  "name": "tfsecurity",
+  "displayName": "tfsecurity",
+  "publisher": "tfsecurity",
+  "description": "tfsecurity integration for Visual Studio Code",
+  "version": "1.11.0",
+  "engines": {
+    "vscode": "^1.54.0"
+  },
+  "icon": "tfsecurity.png",
+  "categories": [
+    "Other",
+    "Linters"
+  ],
+  "languages": [
+    {
+      "id": "terraform",
+      "extensions": [
+        ".tf",
+        ".tf.json"
+      ],
+      "aliases": [
+        "Terraform"
+      ]
+    }
+  ],
+  "activationEvents": [
+    "onView:tfsecurity.issueview",
+    "onLanguage:terraform",
+    "onCommand:tfsecurity.run",
+    "workspaceContains:**/*.tf"
+  ],
+  "main": "./out/main.js",
+  "contributes": {
+    "configuration": {
+      "title": "tfsecurity",
+      "properties": {
+        "tfsecurity.binaryPath": {
+          "type": "string",
+          "default": "tfsecurity",
+          "description": "Path to tfsecurity if not already on the PATH"
+        },
+        "tfsecurity.ignoreDownloadedModules": {
+          "type": "boolean",
+          "default": "true",
+          "description": "Don't include results from downloaded modules. (Still scanned, just not included in the results)"
+        },
+        "tfsecurity.fullDepthSearch": {
+          "type": "boolean",
+          "default": "true",
+          "description": "Scan all terraform in the workspace. This will start at the top and add all terraform files into the model"
+        },
+        "tfsecurity.resolveIgnoreCodes": {
+          "type": "boolean",
+          "default": "true",
+          "description": "Add the description for ignore codes inline with the code"
+        },
+        "tfsecurity.runOnIgnore": {
+          "type": "boolean",
+          "default": "true",
+          "description": "Automatically rerun tfsecurity when a check failure is ignored"
+        },
+        "tfsecurity.debug": {
+          "type": "boolean",
+          "default": "false",
+          "description": "Run tfsecurity with vebose flag to get more information"
+        },
+        "tfsecurity.excludedPaths": {
+          "type": "array",
+          "default": [],
+          "description": "Run tfsecurity but exclude these folders"
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "tfsecurity.run",
+        "title": "tfsecurity: Run tfsecurity against workspace",
+        "icon": {
+          "light": "resources/light/refresh.svg",
+          "dark": "resources/dark/refresh.svg"
+        }
+      },
+      {
+        "command": "tfsecurity.refresh",
+        "title": "tfsecurity: Refresh the issue list"
+      },
+      {
+        "command": "tfsecurity.updatebinary",
+        "title": "tfsecurity: Download the latest version of tfsecurity",
+        "icon": {
+          "light": "resources/light/download.svg",
+          "dark": "resources/dark/download.svg"
+        }
+      },
+      {
+        "command": "tfsecurity.ignore",
+        "title": "Ignore this issue instance"
+      },
+      {
+        "command": "tfsecurity.ignorePath",
+        "title": "Ignore path during tfsecurity runs"
+      },
+      {
+        "command": "tfsecurity.ignoreAll",
+        "title": "Ignore all instances"
+      },
+      {
+        "command": "tfsecurity.ignoreSeverity",
+        "title": "Ignore all instances of severity"
+      },
+      {
+        "command": "tfsecurity.version",
+        "title": "tfsecurity: Get the current version of tfsecurity",
+        "icon": {
+          "light": "resources/light/help.svg",
+          "dark": "resources/dark/help.svg"
+        }
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "tfsecurity",
+          "title": "tfsecurity",
+          "icon": "media/tfsecurity.svg"
+        }
+      ]
+    },
+    "views": {
+      "tfsecurity": [
+        {
+          "id": "tfsecurity.issueview",
+          "name": "Findings Explorer",
+          "icon": "media/tfsecurity.svg",
+          "contextualTitle": "Findings Explorer"
+        },
+        {
+          "id": "tfsecurity.helpview",
+          "name": "Findings Help",
+          "type": "webview",
+          "contextualTitle": "Findings Help"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "tfsecurity.issueview",
+        "contents": "No issues are found.\n[Run tfsecurity now](command:tfsecurity.run)"
+      },
+      {
+        "view": "tfsecurity.helpview",
+        "contents": "No check selected. Run tfsecurity and choose a failed check from the explorer"
+      }
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "tfsecurity.ignorePath",
+          "when": "resourceExtname == .tf || explorerResourceIsFolder"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "tfsecurity.ignore",
+          "when": "false"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "tfsecurity.run",
+          "when": "view == tfsecurity.issueview",
+          "group": "navigation@1"
+        },
+        {
+          "command": "tfsecurity.updatebinary",
+          "when": "view == tfsecurity.issueview",
+          "group": "navigation@2"
+        },
+        {
+          "command": "tfsecurity.version",
+          "when": "view == tfsecurity.issueview",
+          "group": "navigation@2"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "tfsecurity.ignore",
+          "when": "view == tfsecurity.issueview && viewItem == TFSECURITY_FILE_LOCATION"
+        },
+        {
+          "command": "tfsecurity.ignoreAll",
+          "when": "view == tfsecurity.issueview && viewItem == TFSECURITY_CODE"
+        },
+        {
+          "command": "tfsecurity.ignoreSeverity",
+          "when": "view == tfsecurity.issueview && viewItem == TFSECURITY_SEVERITY"
+        }
+      ]
+    },
+    "snippets": [
+      {
+        "language": "yaml",
+        "path": "./src/snippets/custom_checks.json"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run esbuild-base -- --minify",
+    "esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=out/main.js --external:vscode --format=cjs --platform=node",
+    "esbuild": "npm run esbuild-base -- --sourcemap",
+    "esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
+    "test-compile": "tsc -p ./",
+    "compile": "tsc -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts"
+  },
+  "devDependencies": {
+    "@types/mocha": "^8.0.4",
+    "@types/node": "^12.20.13",
+    "@types/semver": "^7.3.6",
+    "@types/vscode": "^1.54.0",
+    "@typescript-eslint/eslint-plugin": "^4.25.0",
+    "@typescript-eslint/parser": "^4.25.0",
+    "esbuild": "^0.14.11",
+    "eslint": "^7.27.0",
+    "mocha": "^10.8.2",
+    "typescript": "^4.5.4",
+    "vscode-test": "^1.5.0"
+  },
+  "repository": {
+    "url": "https://github.com/khulnasoft/vscode-tfsecurity"
+  },
+  "dependencies": {
+    "@types/uuid": "^8.3.4",
+    "semver": "^7.3.5",
+    "typescipt": "^1.0.0",
+    "uuid": "^8.3.2",
+    "vsce": "^1.97.0"
+  }
+}
