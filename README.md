@@ -1,5 +1,9 @@
 # tfsecurity
 
+<a aria-label="khulnasoft logo" href="https://khulnasoft.github.io/vscode-tfsecurity">
+  <img alt="" src="https://img.shields.io/badge/Made%20by%20khulnasoft-000000.svg?style=flat-square&logo=khulnasoft&labelColor=000">
+</a>
+
 This VS Code extension is for [tfsecurity](https://khulnasoft.github.io/tfsecurity/latest). A static analysis security scanner for your Terraform code that discovers problems with your infrastructure before hackers do.
 
 ## Features
